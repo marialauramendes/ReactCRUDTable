@@ -1,8 +1,8 @@
 import React from 'react';
-import { DatePicker } from 'antd';
+import { Dashboard } from './pages/Dashboard';
 
 const App = () => {
-  return <DatePicker />;
+  return <Dashboard />;
 };
 
 export default App;
