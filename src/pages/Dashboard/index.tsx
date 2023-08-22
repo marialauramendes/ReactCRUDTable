@@ -81,15 +81,15 @@ function Dashboard() {
     }
   };
 
-  const editSelectedPost = async (itemSelected: PostType) => {
+  const editSelectedPost = async (dataEdit: PostType) => {
     setLoadingButtons(true);
     try {
-      const { data } = await editPost(itemSelected.id, { ...itemSelected });
+      const { data } = await editPost(dataEdit.id, { ...dataEdit });
 
       setPosts(prevState =>
         prevState.map(item => {
-          if (item.id === itemSelected.id) {
-            return { ...item, title: 'Título alterado' };
+          if (item.id === dataEdit.id) {
+            return { ...dataEdit };
           }
           return item;
         }),
