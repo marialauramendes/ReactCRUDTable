@@ -1,23 +1,17 @@
-import React , { useEffect, useState }from 'react';
-import { getAllPosts } from '../../service/api'
-import TableWrapper  from '../../components/TableWrapper';
-import { PostType } from '../../types'
+import { useEffect, useState } from 'react';
+import { createNewPost, getAllPosts, editPost, deletePost } from '../../service/api';
+
+import { TableWrapper } from '../../components/TableWrapper';
+import { Layout, Spin, Button } from 'antd';
+import { PostType } from '../../types';
 import type { TableProps } from 'antd/es/table';
-import { Layout, Menu, theme} from 'antd';
-import Sider from 'antd/es/layout/Sider';
 
 function Dashboard() {
   const [posts, setPosts] = useState<PostType[]>([]);
-  
+  const [loading, setLoading] = useState<Boolean>(false);
+  const [loadingButtons, setLoadingButtons] = useState<Boolean>(false);
+
   const { Content } = Layout;
-  const {
-    token: { colorBgContainer, borderRadius, padding },
-  } = theme.useToken();
-
-
-  const navList = [
-    {key: 'posts', label: 'Posts'}
-  ];
 
   const thead = [
     {
@@ -35,23 +29,88 @@ function Dashboard() {
       dataIndex: 'title',
       title: 'Título da postagem',
       filters: posts?.map(item => ({ key: item.id, text: item.title, value: item.title })),
-      onFilter: (value: string, record: PostType ) => record.title.indexOf(value) === 0,
+      onFilter: (value: string, record: PostType) => record.title.indexOf(value) === 0,
     },
     {
       key: 'body',
       dataIndex: 'body',
       title: 'Conteúdo da postagem',
     },
+    {
+      key: 'edit',
+      dataIndex: 'edit',
+      title: 'Editar/ Excluir',
+    },
   ];
 
   const getPosts = async () => {
-
+    setLoading(true);
     try {
       const { data } = await getAllPosts();
       setPosts(data);
-
-    } catch(error){
+    } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addNewPost = async () => {
+    setLoadingButtons(true);
+    try {
+      const { data } = await createNewPost({
+        userId: 123,
+        id: 200,
+        title: 'Novo Post',
+        body: 'texto do novo post',
+      });
+
+      setPosts(prevState => [
+        ...prevState,
+        {
+          userId: 123,
+          id: 200,
+          title: 'Novo Post',
+          body: 'texto do novo post',
+        },
+      ]);
+    } catch (error) {
+      // saveLog and notify error to user in a friendly manner
+    } finally {
+      setLoadingButtons(false);
+    }
+  };
+
+  const editSelectedPost = async (itemSelected: PostType) => {
+    setLoadingButtons(true);
+    try {
+      const { data } = await editPost(itemSelected.id, { ...itemSelected });
+
+      setPosts(prevState =>
+        prevState.map(item => {
+          if (item.id === itemSelected.id) {
+            return { ...item, title: 'Título alterado' };
+          }
+          return item;
+        }),
+      );
+    } catch (error) {
+      // saveLog and notify error to user in a friendly manner
+    } finally {
+      setLoadingButtons(false);
+    }
+  };
+
+  const deleteSelectedPost = async (itemSelected: PostType) => {
+    setLoadingButtons(true);
+    try {
+      const { data } = await deletePost(itemSelected.id);
+
+      setPosts(prevState => prevState.filter(item => item.id !== itemSelected.id));
+    } catch (error) {
+      // saveLog and notify error to user in a friendly manner
+    } finally {
+      setLoadingButtons(false);
     }
   };
 
@@ -59,30 +118,44 @@ function Dashboard() {
     console.log(pagination, filters);
   };
 
-  useEffect(()=> {
+  useEffect(() => {
     getPosts();
   }, []);
 
   return (
-    <Layout style={{ minHeight: '100vh', borderRadius: borderRadius, }}>
-      <Layout style={{ background: colorBgContainer }}>
-          <Sider width={200}>
-            <Menu
-              theme='dark'
-              mode="inline"
-              defaultSelectedKeys={['1']}
-              style={{ height: '100%', background: '#001529', padding: padding}}
-              items={navList}
-            />
-          </Sider>
-  
-      <Content style={{ padding: '24px', minHeight: 280, background: '#f5f5f5'}}>
-        <TableWrapper data={posts} thead={thead} onChange={onChange} />
-      </Content>
-      </Layout>
-     
-    </Layout>
+    <Content style={{ padding: '24px', minHeight: 280, background: '#f5f5f5' }}>
+      <Button
+        type="primary"
+        style={{ marginBottom: '24px' }}
+        onClick={() => addNewPost()}
+        disabled={!!loadingButtons}
+        loading={!!loadingButtons}
+      >
+        + Adicionar
+      </Button>
+      {loading ? (
+        <Spin
+          size="large"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      ) : (
+        <TableWrapper
+          data={posts}
+          thead={thead}
+          onChange={onChange}
+          editItem={editSelectedPost}
+          deleteItem={deleteSelectedPost}
+          disableButtons={!!loadingButtons}
+        />
+      )}
+    </Content>
   );
-};
+}
 
 export { Dashboard };
