@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { createNewPost, getAllPosts, editPost, deletePost } from '../../service/api';
 
 import { TableWrapper } from '../../components/TableWrapper';
-import { Layout, Spin, Button } from 'antd';
+import { Layout, Spin, Button, Space } from 'antd';
 import { PostType } from '../../types';
 import type { TableProps } from 'antd/es/table';
 
 function Dashboard() {
   const [posts, setPosts] = useState<PostType[]>([]);
+  const [counter, setCounter] = useState<number>(0);
+
   const [loading, setLoading] = useState<Boolean>(false);
   const [loadingButtons, setLoadingButtons] = useState<Boolean>(false);
 
@@ -107,6 +109,7 @@ function Dashboard() {
       const { data } = await deletePost(itemSelected.id);
 
       setPosts(prevState => prevState.filter(item => item.id !== itemSelected.id));
+      setCounter(prevState => (prevState += 1));
     } catch (error) {
       // saveLog and notify error to user in a friendly manner
     } finally {
@@ -124,15 +127,18 @@ function Dashboard() {
 
   return (
     <Content style={{ padding: '24px', minHeight: 280, background: '#f5f5f5' }}>
-      <Button
-        type="primary"
-        style={{ marginBottom: '24px' }}
-        onClick={() => addNewPost()}
-        disabled={!!loadingButtons}
-        loading={!!loadingButtons}
-      >
-        + Adicionar
-      </Button>
+      <Space align="baseline" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button
+          type="primary"
+          style={{ marginBottom: '24px' }}
+          onClick={() => addNewPost()}
+          disabled={!!loadingButtons}
+          loading={!!loadingButtons}
+        >
+          + Adicionar
+        </Button>
+        <Layout style={{ fontWeight: '700' }}>Contagem de registros deletados: {counter}</Layout>
+      </Space>
       {loading ? (
         <Spin
           size="large"
