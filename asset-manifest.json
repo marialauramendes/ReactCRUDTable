@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/marialauramendes/react-crud/static/css/main.e6c13ad2.css",
+    "main.js": "/marialauramendes/react-crud/static/js/main.b65fd2ee.js",
+    "index.html": "/marialauramendes/react-crud/index.html",
+    "main.e6c13ad2.css.map": "/marialauramendes/react-crud/static/css/main.e6c13ad2.css.map",
+    "main.b65fd2ee.js.map": "/marialauramendes/react-crud/static/js/main.b65fd2ee.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.b65fd2ee.js"
+  ]
+}
