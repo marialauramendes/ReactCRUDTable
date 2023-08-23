@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { createNewPost, getAllPosts, editPost, deletePost } from '../../service/api';
 
 import { TableWrapper } from '../../components/TableWrapper';
+import { FormModal } from '../../components/Form';
+
 import { Layout, Spin, Button, Space } from 'antd';
 import { PostType } from '../../types';
 import type { TableProps } from 'antd/es/table';
@@ -9,7 +11,7 @@ import type { TableProps } from 'antd/es/table';
 function Dashboard() {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [counter, setCounter] = useState<number>(0);
-
+  const [createFormModal, setCreateFormModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<Boolean>(false);
   const [loadingButtons, setLoadingButtons] = useState<Boolean>(false);
 
@@ -51,31 +53,18 @@ function Dashboard() {
       const { data } = await getAllPosts();
       setPosts(data);
     } catch (error) {
-      console.log(error);
+      //
     } finally {
       setLoading(false);
     }
   };
 
-  const addNewPost = async () => {
+  const addNewPost = async (newPost: PostType) => {
     setLoadingButtons(true);
     try {
-      const { data } = await createNewPost({
-        userId: 123,
-        id: 200,
-        title: 'Novo Post',
-        body: 'texto do novo post',
-      });
+      const { data } = await createNewPost(newPost);
 
-      setPosts(prevState => [
-        ...prevState,
-        {
-          userId: 123,
-          id: 200,
-          title: 'Novo Post',
-          body: 'texto do novo post',
-        },
-      ]);
+      setPosts(prevState => [...prevState, data]);
     } catch (error) {
       // saveLog and notify error to user in a friendly manner
     } finally {
@@ -91,7 +80,7 @@ function Dashboard() {
       setPosts(prevState =>
         prevState.map(item => {
           if (item.id === dataEdit.id) {
-            return { ...dataEdit };
+            return { ...data };
           }
           return item;
         }),
@@ -106,7 +95,7 @@ function Dashboard() {
   const deleteSelectedPost = async (itemSelected: PostType) => {
     setLoadingButtons(true);
     try {
-      const { data } = await deletePost(itemSelected.id);
+      await deletePost(itemSelected.id);
 
       setPosts(prevState => prevState.filter(item => item.id !== itemSelected.id));
       setCounter(prevState => (prevState += 1));
@@ -128,16 +117,16 @@ function Dashboard() {
   return (
     <Content style={{ padding: '24px', minHeight: 280, background: '#f5f5f5' }}>
       <Space align="baseline" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Layout style={{ fontWeight: '700' }}>Contagem de registros deletados: {counter}</Layout>
         <Button
           type="primary"
           style={{ marginBottom: '24px' }}
-          onClick={() => addNewPost()}
+          onClick={() => setCreateFormModal(true)}
           disabled={!!loadingButtons}
           loading={!!loadingButtons}
         >
           + Adicionar
         </Button>
-        <Layout style={{ fontWeight: '700' }}>Contagem de registros deletados: {counter}</Layout>
       </Space>
       {loading ? (
         <Spin
@@ -158,6 +147,14 @@ function Dashboard() {
           editItem={editSelectedPost}
           deleteItem={deleteSelectedPost}
           disableButtons={!!loadingButtons}
+        />
+      )}
+      {createFormModal && (
+        <FormModal
+          title="Criar Post"
+          open={createFormModal}
+          close={() => setCreateFormModal(false)}
+          confirm={newPost => addNewPost(newPost)}
         />
       )}
     </Content>

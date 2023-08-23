@@ -17,27 +17,18 @@ type Props = {
 
 function TableWrapper({ data, thead, onChange, editItem, deleteItem, disableButtons }: Props) {
   const [openOpenPopUp, setOpenPopUp] = useState<number | false>(false);
-  const [editForm, setEditForm] = useState<number | false>(false);
+  const [editForm, setEditForm] = useState<PostType | false>(false);
 
   const dataSource = data?.map(item => ({
     ...item,
     edit: (
       <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-        <FormModal
-          title={`Editar Post #${item.id}`}
-          dataEdit={item}
-          open={editForm === item.id || false}
-          close={() => setEditForm(false)}
-          confirm={dataEdit => editItem(dataEdit)}
-        >
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => setEditForm(item.id)}
-            disabled={disableButtons}
-            loading={disableButtons}
-          />
-        </FormModal>
-
+        <Button
+          icon={<EditOutlined />}
+          onClick={() => setEditForm(item)}
+          disabled={disableButtons}
+          loading={disableButtons}
+        />
         <ConfirmationPopUp
           title="Deletar"
           description={`Deseja confirmar a exclusão do item ${item.id}? Esta ação não poderá ser desfeita.`}
@@ -56,7 +47,20 @@ function TableWrapper({ data, thead, onChange, editItem, deleteItem, disableButt
     ),
   }));
 
-  return <Table columns={thead} dataSource={dataSource} onChange={onChange} />;
+  return (
+    <>
+      <Table columns={thead} dataSource={dataSource} onChange={onChange} />
+      {editForm && (
+        <FormModal
+          title={`Editar Post #${editForm.id}`}
+          dataEdit={editForm}
+          open={!!editForm}
+          close={() => setEditForm(false)}
+          confirm={dataEdit => editItem(dataEdit)}
+        />
+      )}
+    </>
+  );
 }
 
 export { TableWrapper };

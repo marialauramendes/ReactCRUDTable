@@ -4,11 +4,11 @@ import { PostType } from '../../types';
 
 type Props = {
   title: string;
-  dataEdit: PostType;
+  dataEdit?: PostType;
   open: boolean;
   close: () => void;
   confirm: (values: PostType) => void;
-  children: ReactElement;
+  children?: ReactElement;
 };
 
 function FormModal({ title, dataEdit, open, close, confirm, children }: Props) {
@@ -18,11 +18,9 @@ function FormModal({ title, dataEdit, open, close, confirm, children }: Props) {
 
   const onFinish = (values: PostType) => {
     setConfirmLoading(true);
-    confirm(values);
-    setTimeout(() => {
-      close();
-      setConfirmLoading(false);
-    }, 2000);
+    confirm({ userId: Number(values.userId), id: Number(values.id), title: values.title, body: values.body });
+    close();
+    setConfirmLoading(false);
   };
 
   const handleCancel = () => {
@@ -31,14 +29,22 @@ function FormModal({ title, dataEdit, open, close, confirm, children }: Props) {
 
   return (
     <>
-      {children}
-      <Modal title={title} open={open} onCancel={handleCancel}>
+      {/* {children} */}
+      <Modal title={title} open={open} onCancel={handleCancel} footer={null}>
         <Form layout="vertical" initialValues={dataEdit} onFinish={onFinish}>
-          <Form.Item label="ID do usuário" name="userId">
-            <Input disabled />
+          <Form.Item
+            label="ID do usuário"
+            name="userId"
+            rules={[{ pattern: new RegExp(/^[0-9]+$/), min: 1, message: 'É necessário inserir um número válido.' }]}
+          >
+            <Input disabled={!!dataEdit} required />
           </Form.Item>
-          <Form.Item label="ID da Postagem" name="id">
-            <Input disabled />
+          <Form.Item
+            label="ID da Postagem"
+            name="id"
+            rules={[{ pattern: new RegExp(/^[0-9]+$/), min: 1, message: 'É necessário inserir um número válido.' }]}
+          >
+            <Input disabled={!!dataEdit} required />
           </Form.Item>
           <Form.Item label="Título da Postagem" name="title">
             <Input required />
