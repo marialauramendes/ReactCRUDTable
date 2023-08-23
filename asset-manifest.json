@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/marialauramendes/react-crud/static/css/main.e6c13ad2.css",
-    "main.js": "/marialauramendes/react-crud/static/js/main.c488261d.js",
-    "index.html": "/marialauramendes/react-crud/index.html",
-    "main.e6c13ad2.css.map": "/marialauramendes/react-crud/static/css/main.e6c13ad2.css.map",
-    "main.c488261d.js.map": "/marialauramendes/react-crud/static/js/main.c488261d.js.map"
+    "main.css": "/react-crud/static/css/main.e6c13ad2.css",
+    "main.js": "/react-crud/static/js/main.c488261d.js",
+    "index.html": "/react-crud/index.html",
+    "main.e6c13ad2.css.map": "/react-crud/static/css/main.e6c13ad2.css.map",
+    "main.c488261d.js.map": "/react-crud/static/js/main.c488261d.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
